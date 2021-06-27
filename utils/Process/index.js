@@ -24,6 +24,14 @@ module.exports = class Process {
     return this._arrivalTime;
   }
 
+  get getCompleteTime() {
+    return this._completeTime;
+  }
+
+  get getTurnAroundTime() {
+    return this._turnAroundTime;
+  }
+
   completeTime(value = 0) {
     this._completeTime = value;
     this._turnAroundTime = this._completeTime - this._arrivalTime;
