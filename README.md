@@ -10,6 +10,7 @@ Programa para simular la programación de procesos de un Round Robin con priorid
 | Tarmeño Noriega, Carlos Daniel |
 
 ## Descripción
+ - En la carpeta utils/solveWithRoundRobin se encuentra el algoritmo en sí
 
  - En la carpeta **"datasets"** se encuentran los archivos txt que correspondes a los archivos de prueba. 
   
