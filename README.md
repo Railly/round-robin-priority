@@ -4,10 +4,10 @@ Programa para simular la programación de procesos de un Round Robin con priorid
 ## *Integrantes del grupo*
 
 | Nombre |
-|--|--|
+|--|
 | Hugo Quispe, Railly Angelo |
 | Gomez Huanca, Elian Dalmiro |
-| Tarmeño Noriega, Carlos Daniel ||
+| Tarmeño Noriega, Carlos Daniel |
 
 ## Descripción
 
