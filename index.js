@@ -1,12 +1,13 @@
-const solveWithRoundRobin = require("./utils/solveWithRoundRobin");
+const resolverRoundRobin = require("./utils/solveWithRoundRobin");
 const getAverageColumn = require("./utils/getAverageColumn");
 const { readFileSync } = require("fs");
 
-const fileNumber = Array.from({ length: 4 }, (v, i) => i + 1);
+const fileNumber = Array.from({ length: 7 }, (v, i) => i + 1);
 
 fileNumber.forEach((number) => {
   const input = readFileSync(`./datasets/${number}.txt`, "utf8");
-  const rr = solveWithRoundRobin(input);
+  console.log(number);
+  const rr = resolverRoundRobin(input);
   const averageCompleteTime = getAverageColumn(rr, "completeTime");
   const averageTurnAroundTime = getAverageColumn(rr, "turnAroundTime");
   console.log(`FILE: ${number}.txt`);

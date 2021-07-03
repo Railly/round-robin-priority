@@ -1,46 +1,55 @@
 const Process = require("../Process");
 
-/* READING DATA FROM dataset.txt*/
-const solveWithRoundRobin = (input) => {
-  let lines = input.split("\n");
+const CreaProceso = (PID, llegada, duracion, prioridad) => {
+  return new Process(PID, llegada, duracion, prioridad);
+};
+
+const obtenerProcesos = (lines) => {
   let index = 0;
+  let procesos = lines
+    .map((line) => {
+      let value = lines[index].split(" ");
+      index++;
+      if (line !== "") {
+        return CreaProceso(
+          value[0],
+          Number(value[1]),
+          Number(value[2]),
+          Number(value[3])
+        );
+      }
+    })
+    .slice(0, -1);
+  return procesos;
+};
 
+const obtenerVariables = (input) => {
+  let lines = input.split("\n");
   /* FILLING ARRAY WITH READEN DATA*/
-
-  const rawProcesses = lines.map((line) => {
-    let value = lines[index].split(" ");
-    index++;
-    if (line !== "") {
-      return new Process(
-        value[0],
-        Number(value[1]),
-        Number(value[2]),
-        Number(value[3])
-      );
-    }
-  });
-
-  /* DECLARING VARIABLES*/
-
-  // Deleting last undefined item
-  let processes = rawProcesses.slice(0, -1);
-  // Queue of processes
-  let queue = [];
+  let procesos = obtenerProcesos(lines);
   // Number of intervals
-  let time = 0;
-  let pseudoTime = 0;
-  // Zero-filled object with the current intervals of each process
-  let currentIntervals = {};
-  processes.forEach((p) => {
-    currentIntervals = { ...currentIntervals, [p.identifier]: 0 };
+  let numero_de_intervalos = {};
+  procesos.forEach((p) => {
+    numero_de_intervalos = { ...numero_de_intervalos, [p.identifier]: 0 };
   });
   // Number of processes left
-  let remainingProcesses = processes.length;
-  // Output
-  let outputProcesses = [];
+  let procesosRestantes = procesos.length;
+  return { procesos, numero_de_intervalos, procesosRestantes };
+};
 
-  const calculateQueue = () => {
-    processes = processes.filter((p) => {
+/* READING DATA FROM dataset.txt*/
+const resolverRoundRobin = (input) => {
+  // Queue of procesos
+  let queue = [];
+  // Output
+  let salidaProcesos = [];
+  let time = 0;
+  let { procesos, numero_de_intervalos, procesosRestantes } = obtenerVariables(
+    input
+  );
+
+  const calcularCola = () => {
+    procesos = procesos.filter((p) => {
       if (p.arrivalTime === time) {
         if (queue.length === 0) {
           queue.push(p);
@@ -66,48 +75,47 @@ const solveWithRoundRobin = (input) => {
     });
   };
 
-  /* STARTING THE PROGRAM  */
-  //console.table(processes);
+  const SiguientePID = () => {
+    return queue.shift();
+  };
 
-  while (remainingProcesses) {
-    // Filling queue and filtering processes
-    calculateQueue();
-    // Extracting current proces
-    const currentProcess = queue.shift();
-
-    if (
-      currentIntervals[currentProcess.identifier] !== currentProcess.burstTime
-    ) {
-      for (let i = 0; i < currentProcess.priority; i++) {
-        currentIntervals[currentProcess.identifier]++;
-        if (
-          currentIntervals[currentProcess.identifier] ===
-          currentProcess.burstTime
-        ) {
-          currentProcess.completeTime(time + 1);
-          outputProcesses.push(currentProcess);
-          remainingProcesses--;
+  const AsignaCPU = (proceso, numero_de_intervalos) => {
+    if (numero_de_intervalos[proceso.identifier] !== proceso.burstTime) {
+      for (let i = 0; i < proceso.priority; i++) {
+        numero_de_intervalos[proceso.identifier]++;
+        if (numero_de_intervalos[proceso.identifier] === proceso.burstTime) {
+          proceso.completeTime(time + 1);
+          salidaProcesos.push(proceso);
+          procesosRestantes--;
           time++;
-          calculateQueue();
+          calcularCola();
           break;
         }
         time++;
-        calculateQueue();
-      }
-      if (
-        currentIntervals[currentProcess.identifier] !== currentProcess.burstTime
-      ) {
-        // Queuing the current process for next iteration
-        queue.push(currentProcess);
+        calcularCola();
       }
     }
+  };
 
-    pseudoTime = pseudoTime + currentProcess.priority;
+  const DesasignaCPU = (proceso) => {
+    if (numero_de_intervalos[proceso.identifier] !== proceso.burstTime) {
+      // Queuing the current process for next iteration
+      queue.push(proceso);
+    }
+  };
+
+  /* STARTING THE PROGRAM  */
+  while (procesosRestantes) {
+    // Filling queue and filtering procesos
+    calcularCola();
+    const proceso = SiguientePID();
+    AsignaCPU(proceso, numero_de_intervalos);
+    DesasignaCPU(proceso);
   }
 
-  outputProcesses.sort((x, y) => x.arrivalTime - y.arrivalTime);
-
-  return outputProcesses;
+  // Sorting processes by arrival time
+  salidaProcesos.sort((x, y) => x.arrivalTime - y.arrivalTime);
+  return salidaProcesos;
 };
 
-module.exports = solveWithRoundRobin;
+module.exports = resolverRoundRobin;
